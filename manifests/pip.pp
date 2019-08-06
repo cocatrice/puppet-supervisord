@@ -28,7 +28,7 @@ class supervisord::pip inherits supervisord {
   # See https://github.com/pypa/setuptools/issues/581
   exec { 'reinstall_setuptools':
     command => 'pip install --upgrade setuptools',
-    onlyif  => 'pip list | grep "setuptools 33.1.1"',
+    onlyif  => 'pip list | grep "setuptools 33.1.1" || ! pip list | grep "setuptools"',
     require => Exec['install_pip'],
   }
 
