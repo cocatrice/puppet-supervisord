@@ -35,7 +35,7 @@ class supervisord::pip inherits supervisord {
   exec { 'upgrade_setuptools':
     command     => 'pip install --upgrade setuptools || pip list | grep "setuptools"',
     environment => ['LC_ALL=C'],
-    onlyif      => 'pip list | grep "setuptools" | grep "33.1.1" || ! pip list | grep "setuptools"',
+    onlyif      => 'pip list | awk \'/setuptools/ {print $2}\' | xargs -I % dpkg --compare-versions % le 33.1.1 || ! pip list | grep "setuptools"',
     require     => Exec['upgrade_pip'],
   }
 
