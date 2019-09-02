@@ -16,7 +16,7 @@ class supervisord::pip inherits supervisord {
     command => "curl ${supervisord::setuptools_url} | python",
     cwd     => '/tmp',
     require => Package['curl'],
-    unless  => 'which easy_install',
+    unless  => 'which easy_install && easy_install --version | grep setuptools',
   }
 
   exec { 'install_pip':
