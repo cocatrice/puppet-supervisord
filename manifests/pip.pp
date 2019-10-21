@@ -26,9 +26,11 @@ class supervisord::pip inherits supervisord {
   }
 
   # See https://github.com/pypa/setuptools/issues/581
+  # On Precise, the `pip` command provided by `python-pip` doesn't support `pip list` and shows `No command by the name pip list`
+  # And it also uses the unsupported HTTP index http://pypi.python.org/simple/
   exec { 'upgrade_pip':
-    command => 'pip install --upgrade pip',
-    onlyif  => 'pip list 2>&1 | grep "You should consider upgrading"',
+    command => 'pip install --index-url https://pypi.python.org/simple/ --upgrade pip && hash -r',
+    onlyif  => 'pip list 2>&1 | grep "You should consider upgrading" || pip list 2>&1 | grep "No command by the name pip list"',
     require => Exec['install_pip'],
   }
 
