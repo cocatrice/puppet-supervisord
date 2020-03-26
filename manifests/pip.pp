@@ -12,26 +12,12 @@ class supervisord::pip inherits supervisord {
     ensure_packages('curl')
   }
 
-  exec { 'install_setuptools':
-    command => "curl ${supervisord::setuptools_url} | python",
-    cwd     => '/tmp',
-    require => Package['curl'],
-    unless  => 'which easy_install && easy_install --version | grep setuptools',
-  }
-
-  exec { 'install_pip':
-    command => 'easy_install pip',
-    require => Exec['install_setuptools'],
-    unless  => 'which pip',
-  }
-
   # See https://github.com/pypa/setuptools/issues/581
   # On Precise, the `pip` command provided by `python-pip` doesn't support `pip list` and shows `No command by the name pip list`
   # And it also uses the unsupported HTTP index http://pypi.python.org/simple/
   exec { 'upgrade_pip':
     command => 'pip install --index-url https://pypi.python.org/simple/ --upgrade pip && hash -r',
     onlyif  => 'pip list 2>&1 | grep "You should consider upgrading" || pip list 2>&1 | grep "No command by the name pip list"',
-    require => Exec['install_pip'],
   }
 
   exec { 'upgrade_setuptools':
